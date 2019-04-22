@@ -86,7 +86,6 @@ int main()
 				else{
 					cout<<"Excellent fill"<<endl;
 				}
-				null(chm,chm_fill,chm_table);
             }
             if(chm_fill==3){
 				system("cls");
@@ -112,7 +111,7 @@ int main()
 		}
 //=========================================================================
 		if(chm==2){
-			err=0;
+			/*err=0;
 			TElem el;
 			system("cls");
 			_row=a.get_row();
@@ -127,11 +126,15 @@ int main()
 					}
 					cout<<endl;
 				}
-			}
+			}*/
+			system("cls");
+			err=Redact(a);
+			if(err==EMPTY_TABLE)cout<<"TABLE DONT EXSIST"<<endl;
 			null(chm,chm_fill,chm_table);
 		}
 //==================================================================================
 		if(chm==3){
+			system("cls");
 			err=0;
 			err=Sort(a);
 			if(err==EMPTY_TABLE)cout<<"EMPTY TABLE"<<endl;

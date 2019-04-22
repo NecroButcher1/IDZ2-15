@@ -8,6 +8,8 @@
 #include <time.h>
 #include <math.h>
 #include <cmath>
+#include <conio.h>
+#include <windows.h>
 using namespace std;
 enum err{INNCORECT_DATA=1,EMPTY_TABLE=2,ERR_FILE=3,EMPTY_FILE=4};
 typedef int TElem;
@@ -18,10 +20,11 @@ private:
 	T **body;
 	int errcode;
 
-
+	template<typename T1>friend int redact_printf(table<T1>&,int,int,int,int);
+    template<typename T1>friend int Redact(table<T1>&);
 	template<typename T1>friend int Sort(table<T1>&);
 	template<typename T1>friend int getfile(std::ifstream&,table<T1>&);
-	template<typename T1>friend int Save(std::ostream&,table<T1>&);
+	template<typename T1>friend int Save(std::ostream&,table<T1>);
 public:
 	table();
 	int Set(int,int,T);

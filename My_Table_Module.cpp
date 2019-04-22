@@ -51,6 +51,7 @@ int table<T>::create(int _row,int _col){
 template<typename T1>
 int getfile(std::ifstream &in,table<T1> &t){
     int num=0,_row=0,_col=0;
+    t.del();
     int errcode=0;
     if(!in.is_open())errcode=ERR_FILE;
     else{
@@ -63,8 +64,8 @@ int getfile(std::ifstream &in,table<T1> &t){
 			in>>_col;
 			if(in.fail())errcode=INNCORECT_DATA;
 			if(errcode==0)t.create(_row,_col);
-			for(unsigned i=0;((i<t.row)&&(errcode==0));i++){
-				for(unsigned j=0;((j<t.col)&&(errcode==0));j++){
+			for(int i=0;((i<t.row)&&(errcode==0));i++){
+				for(int j=0;((j<t.col)&&(errcode==0));j++){
 					in>>t.body[i][j];
 					if(in.fail()){
 						errcode=INNCORECT_DATA;
@@ -73,7 +74,7 @@ int getfile(std::ifstream &in,table<T1> &t){
 					num++;
 				}
 			}
-			if(num!=0||(num!=_row*_col))t.del();
+			if(errcode!=0||(num!=_row*_col))t.del();
 		}
     }
     return errcode;
@@ -115,7 +116,7 @@ int Sort(table<T1> &t){
 	return errcode;
 }
 template<typename T>
-int Save(std::ostream& out,table<T> &t){
+int Save(std::ostream& out,table<T> t){
 	int errcode;
 	if(t.body==NULL)errcode=EMPTY_TABLE;
 	else{
@@ -149,4 +150,285 @@ table<T>::~table(){
 		row=0;
 		col=0;
 	}
+}
+template<typename T1>
+int redact_printf(table<T1>&b,int lx,int ly,int size_y,int size_x){
+	int out=0,i,j;
+	if(b.body!=NULL){
+		system("cls");
+		cout<<"==========================================================="<<endl;
+		cout<<"1.[Esc]    =Exit             [TAB] = GoTo elem[i][j]"<<endl;
+		cout<<"2.[PgDown] =Fill from file   [PgUp]=Save in File"<<endl;
+		cout<<"3.[ENTER]  =Redact elem"<<endl;
+		cout<<"==========================================================="<<endl;
+		if(b.row>=size_y){
+            if(b.col>=size_x){
+                for(i=ly;i<size_y;i++){
+                    for(j=lx;j<size_x;j++){
+                        cout.width(6);
+                        cout<<b.body[i][j];
+                    }
+                    cout<<endl;
+                }
+            }
+            else{
+                for(i=ly;i<size_y;i++){
+                    for(j=0;j<b.col;j++){
+                        cout.width(6);
+                        cout<<b.body[i][j];
+                    }
+                    cout<<endl;
+                }
+            }
+        }
+        else{
+            if(b.col>=size_x){
+                for(i=0;i<b.row;i++){
+                    for(j=lx;j<size_x;j++){
+                        cout.width(6);
+                        cout<<b.body[i][j];
+                    }
+                cout<<endl;
+                }
+            }
+            else{
+                for(i=0;i<b.row;i++){
+                    for(j=0;j<b.col;j++){
+                        cout.width(6);
+                        cout<<b.body[i][j];
+                    }
+                    cout<<endl;
+                }
+            }
+        }
+    }
+    else{
+        out=EMPTY_TABLE;
+    }
+    return out;
+}
+template<typename T1>
+int Redact(table<T1>&b){
+	int out=0,i,j,size_x=10,size_y=10,lx=0,ly=0,check,cord_y=-1,cord_x=-1,check_file,ichecker,x,y;
+	char filename[50],s[5]=".txt";
+	T1 c,k;
+	if(b.body==NULL)out=EMPTY_TABLE;
+	else{
+		redact_printf(b,lx,ly,size_y,size_x);
+		bool exit=false;
+		int ch;
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		COORD position ={1,5};
+		SetConsoleCursorPosition(hConsole,position);
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
+		while(!exit){
+			ch=_getch();
+			switch(ch){
+			case 224:
+				{
+				switch(_getch()){
+				case 73:
+					{
+						system("cls");
+						cout<<"PRESS FILE NAME >>";
+						cin>>filename;
+						strcat(filename,s);
+						ofstream fout;
+						fout.open(filename);
+						ichecker=Save(fout,b);
+						fout.close();
+						if(ichecker==EMPTY_TABLE){
+							cout<<"TABLE DONT EXIST"<<endl;
+							out=1;
+							exit=true;
+						}
+						if(ichecker==0){
+							cout<<"EXCELENT FILL"<<endl;
+							getchar();
+							cout<<"PRESS ENTER"<<endl;
+							getchar();
+							redact_printf(b,lx,ly,size_y,size_x);
+						}
+						position={1,5};
+                        SetConsoleCursorPosition(hConsole, position);
+                        SetConsoleCursorPosition(hConsole, position);
+                        break;
+					}
+					case 81:
+					{
+						system("cls");
+						cout<<"PRESS FILE NAME >>: ";
+						cin>>filename;
+						strcat(filename,s);
+						ifstream fin;
+						fin.open(filename);
+						b.del();
+						ichecker=getfile(fin,b);
+						fin.close();
+						if(ichecker==0){
+							cout<<"EXCELLENT FILL"<<endl;
+							cout<<"PRESS ENTER"<<endl;
+							_getch();
+							system("cls");
+							redact_printf(b,lx,ly,size_y,size_x);
+							position={1,5};
+							SetConsoleCursorPosition(hConsole, position);
+							SetConsoleCursorPosition(hConsole, position);
+						}
+						else{
+							if(ichecker==ERR_FILE)cout<<"ERROR OPEN FILE"<<endl;
+							if(ichecker==EMPTY_FILE)cout<<"EMPTY FILE"<<endl;
+							if(ichecker==INNCORECT_DATA)cout<<"INNCORECT DATA"<<endl;
+							b.del();
+							out=1;
+							exit=true;
+						}
+						break;
+					}
+					case 72:
+					{
+						if(position.Y>5){
+							position.Y--;
+                            SetConsoleCursorPosition(hConsole, position);
+                            SetConsoleCursorPosition(hConsole, position);
+						}
+						if(position.Y==5){
+							if(size_y>10){
+								ly--;
+								size_y--;
+								redact_printf(b,lx,ly,size_y,size_x);
+								position.Y=5;
+								SetConsoleCursorPosition(hConsole, position);
+								SetConsoleCursorPosition(hConsole, position);
+							}
+						}
+						break;
+					}
+					case 80:
+					{
+						 if(b.row>size_y){
+                            if(position.Y<14){
+                                position.Y++;
+                                SetConsoleCursorPosition(hConsole, position);
+                                SetConsoleCursorPosition(hConsole, position);
+                            }
+                            if(position.Y==14){ //position.Y==size_y+3
+                                ly++;
+                                size_y++;
+                                redact_printf(b,lx,ly,size_y,size_x);
+                                position.Y=14;
+                                SetConsoleCursorPosition(hConsole, position);
+                                SetConsoleCursorPosition(hConsole, position);
+                            }
+                        }
+                        else{
+                            if(position.Y<b.row-ly+4)
+                            {
+                                position.Y++;
+                                SetConsoleCursorPosition(hConsole, position);
+                                SetConsoleCursorPosition(hConsole, position);
+                            }
+                        }
+                        break;
+					}
+					case 77:
+					{
+						if(b.col>size_x){
+                            if(position.X<60){
+                                position.X++;
+                                SetConsoleCursorPosition(hConsole, position);
+                                SetConsoleCursorPosition(hConsole, position);
+                            }
+                            if(position.X==60){
+                                lx++;
+                                size_x++;
+                                redact_printf(b,lx,ly,size_y,size_x);
+                                position.X=59;
+                                SetConsoleCursorPosition(hConsole, position);
+                                SetConsoleCursorPosition(hConsole, position);
+                            }
+                        }
+                        else {
+                            if(position.X<(b.col*6-lx*6-1)){
+                                position.X++;
+                                SetConsoleCursorPosition(hConsole, position);
+                                SetConsoleCursorPosition(hConsole, position);
+                            }
+                        }
+                        break;
+					}
+					case 75:
+					{
+						 if(position.X>1){
+                            position.X--;
+                            SetConsoleCursorPosition(hConsole, position);
+                            SetConsoleCursorPosition(hConsole, position);
+                        }
+                        if(position.X==1){
+                            if(size_x>10){
+                                lx--;
+                                size_x--;
+                                system("cls");
+                                redact_printf(b,lx,ly,size_y,size_x);
+                                position.X=1;
+                                SetConsoleCursorPosition(hConsole, position);
+                                SetConsoleCursorPosition(hConsole, position);
+                            }
+                        }
+                        break;
+					}
+					default:
+                    break;
+				}
+				break;
+			}
+			case 13:
+			{
+				check=0;
+				system("cls");
+				while((!cin)||(check<1)||(check>2)){
+					system("cls");
+					cout<<"Change elem ?"<<endl;
+					cout<<"1.Yes"<<endl;
+                    cout<<"2.NO"<<endl;
+                    cin>>check;
+				}
+				if(check==1){
+					x=(position.X)/6+lx;
+					y=position.Y-5+ly;
+					c=b.body[y][x];
+					 system("cls");
+					cout<<x<<" "<<y<<endl;
+					cout<<c<<" "<<"PRESS ELEM >>";
+					cin>>k;
+					while(!cin){
+						system("cls");
+						cin.clear();
+						std::cin.ignore(32767, '\n');
+						cout<<c<<" "<<"PRESS ELEM >>";
+						cin>>k;
+					}
+					b.body[y][x]=k;
+					redact_printf(b,lx,ly,size_y,size_x);
+				}
+				else{
+					redact_printf(b,lx,ly,size_y,size_x);
+				}
+					position = {1, 5};
+					SetConsoleCursorPosition(hConsole, position);
+					SetConsoleCursorPosition(hConsole, position);
+					break;
+				}
+				   case 27:
+                {
+                    exit = true;
+                    break;
+                }
+                default:
+                break;
+			}
+		}
+	}
+	system("cls");
+	return out;
 }
