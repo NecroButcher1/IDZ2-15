@@ -24,9 +24,9 @@ private:
     template<typename T1>friend int Redact(table<T1>&);
 	template<typename T1>friend int Sort(table<T1>&);
 	template<typename T1>friend int getfile(std::ifstream&,table<T1>&);
-	template<typename T1>friend int Save(std::ostream&,table<T1>);
 public:
 	table();
+	int Save(std::ostream&);
 	int Set(int,int,T);
 	int Get(int,int,T&);
 	int create(int,int);

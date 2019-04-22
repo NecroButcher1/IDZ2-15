@@ -116,20 +116,21 @@ int Sort(table<T1> &t){
 	return errcode;
 }
 template<typename T>
-int Save(std::ostream& out,table<T> t){
-	int errcode;
-	if(t.body==NULL)errcode=EMPTY_TABLE;
+int table<T>::Save(std::ostream& out){
+	int errcode=0;
+	if(body==NULL)errcode=EMPTY_TABLE;
 	else{
-		out<<t.row<<endl;
-		out<<t.col<<endl;
-		for(unsigned i=0;i<t.row;i++){
-			for(unsigned j=0;j<t.col;j++){
-				out<<t.body[i][j]<<" ";
+		out<<row<<endl;
+		out<<col<<endl;
+		for(unsigned i=0;i<row;i++){
+			for(unsigned j=0;j<col;j++){
+				out<<body[i][j]<<" ";
 			}
 			out<<endl;
 		}
 	}
 	return errcode;
+	//cout<<"lol";
 }
 template<typename T>
 void table<T>::del(){
@@ -235,7 +236,7 @@ int Redact(table<T1>&b){
 						strcat(filename,s);
 						ofstream fout;
 						fout.open(filename);
-						ichecker=Save(fout,b);
+						ichecker=b.Save(fout);
 						fout.close();
 						if(ichecker==EMPTY_TABLE){
 							cout<<"TABLE DONT EXIST"<<endl;
@@ -419,6 +420,70 @@ int Redact(table<T1>&b){
 					SetConsoleCursorPosition(hConsole, position);
 					break;
 				}
+				 case 9:
+                {
+                    system("cls");
+                    cord_y=-1;
+                     while((cord_y<0)||(cord_y>b.row)||(std::cin.fail())){
+                        system("cls");
+                        cout<<"press CORD [i] >>";
+                        cin>>cord_y;
+                            if(std::cin.fail()){
+                                system("cls");
+                                cord_y=-1;
+                                std::cin.clear();
+                                std::cin.ignore(32767, '\n');
+                                cout<<"press CORD [i] >>";
+                                cin>>cord_y;
+                            }
+                    }
+                    cord_x=-1;
+                    while((cord_x<0)||(cord_x>b.col)||(std::cin.fail())){
+                        system("cls");
+                        cout<<"press CORD [j] >>";
+                        cin>>cord_x;
+                            if(std::cin.fail()){
+                                system("cls");
+                                cord_x=-1;
+                                std::cin.clear();
+                                std::cin.ignore(32767, '\n');
+                                cout<<"press CORD [j] >>";
+                                cin>>cord_x;
+                            }
+                        }
+                        if(cord_y<=ly){
+                            while(ly>=cord_y){
+                                ly--;
+                                size_y--;
+                            }
+                        }
+                        if(cord_x<=lx){
+                            while(lx>=cord_x){
+                                lx--;
+                                size_x--;
+                            }
+                        }
+                        if(cord_y>size_y){
+                            while(size_y<cord_y){
+                                size_y++;
+                                ly++;
+                            }
+                        }
+                        if(cord_x>size_x){
+                            while(size_x<cord_x){
+                                size_x++;
+                                lx++;
+                            }
+                        }
+                        cord_x=cord_x*6-1-6*lx;
+                        cord_y=cord_y+4-ly;
+                        redact_printf(b,lx,ly,size_y,size_x);
+                        position.Y=cord_y;
+                        position.X=cord_x;
+                        SetConsoleCursorPosition(hConsole, position);
+                        SetConsoleCursorPosition(hConsole, position);
+                        break;
+                    }
 				   case 27:
                 {
                     exit = true;

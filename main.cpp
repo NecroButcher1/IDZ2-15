@@ -10,10 +10,16 @@ struct Node{
 	Node *next;
 };
 typedef Node *PNode;
+void AddFirst(PNode &head,PNode NewTable);
+void AddLast(PNode &head,PNode NewTable);
+void AddAfter(PNode p, PNode NewTable);
+PNode NewTable();
 int main()
 {
+	PNode head=NULL,p=NULL;
 	srand(time(NULL));
-	table<TElem> a;
+	p=NewTable();
+	AddLast(head,p);
 	char s[8]=".txt";
     int chm=0,Number_table=1,chm_fill=0,chm_table=0,_row,_col,err=0,num;
     while(chm!=5){
@@ -39,11 +45,12 @@ int main()
 				cin>>chm_fill;
             }
             if(chm_fill==1){ //FROM KEYBOARD FILL
+				system("cls");
 				err=0;num=0;
-				a.del();
+				p->a.del();
 				TElem el;
 				Size(_row,_col);
-				a.create(_row,_col);
+				p->a.create(_row,_col);
 				for(unsigned i=0;((i<_row)&&(err==0));i++){
 					for(unsigned j=0;((j<_col)&&(err==0));j++){
 						system("cls");
@@ -56,32 +63,32 @@ int main()
 							cin.ignore(32767,'\n');
 							cin>>el;
 						}
-						a.Set(i,j,el);
+						p->a.Set(i,j,el);
 						num++;
 					}
 				}
 				if(num<_row*_col){
 					cout<<"ERROR FILL"<<endl;
-					a.del();
+					p->a.del();
 				}
 				null(chm,chm_fill,chm_table);
             }
             if(chm_fill==2){  // RANDOM FILL
-				a.del();
+				p->a.del();
 				TElem el;
 				err=0;num=0;
 				Size(_row,_col);
-				a.create(_row,_col);
+				p->a.create(_row,_col);
 				for(unsigned i=0;((i<_row)&&(err==0));i++){
 					for(unsigned j=0;((j<_col)&&(err==0));j++){
 						el=(TElem)(rand()%2000-1000);
-						a.Set(i,j,el);
+						p->a.Set(i,j,el);
 						num++;
 					}
 				}
 				if((num<_row*_col)||(err!=0)){
 					cout<<"ERROR FILL"<<endl;
-					a.del();
+					p->a.del();
 				}
 				else{
 					cout<<"Excellent fill"<<endl;
@@ -96,7 +103,7 @@ int main()
 				strcat(name,s);
 				ifstream fin;
 				fin.open(name);
-				err=getfile(fin,a);
+				err=getfile(fin,p->a);
 				if(err==ERR_FILE)cout<<"ERROR OPEN FILE"<<endl;
 				if(err==EMPTY_FILE)cout<<"EMPTY FILE"<<endl;
 				if(err==INNCORECT_DATA)cout<<"INNCORRECT DATA"<<endl;
@@ -128,7 +135,7 @@ int main()
 				}
 			}*/
 			system("cls");
-			err=Redact(a);
+			err=Redact(p->a);
 			if(err==EMPTY_TABLE)cout<<"TABLE DONT EXSIST"<<endl;
 			null(chm,chm_fill,chm_table);
 		}
@@ -136,13 +143,77 @@ int main()
 		if(chm==3){
 			system("cls");
 			err=0;
-			err=Sort(a);
+			err=Sort(p->a);
 			if(err==EMPTY_TABLE)cout<<"EMPTY TABLE"<<endl;
 			else cout<<"TABLE SORT"<<endl;
 			null(chm,chm_fill,chm_table);
 		}
+		if(chm==4){
+			system("cls");
+			menu_table(Number_table);
+            cin>>chm_table;
+            while((!cin)||(chm_table<1)||(chm_table>4)){
+				system("cls");
+				menu_table(Number_table);
+				cin.clear();
+				cin.ignore(32767,'\n');
+				cin>>chm_table;
+            }
+            if(chm_table==1){
+				p=NewTable();
+				if(p==NULL){
+                system("cls");
+                cout<<"Memory end"<<endl;
+				}
+				else{
+					Number_table++;
+					AddLast(head,p);
+				}
+            }
+			if(chm_table==3){
+				if(p->next){
+					Number_table++;
+					p=p->next;
+				}
+				else{
+					system("cls");
+					cout<<"Last elem"<<endl;
+				}
+			}
+			if(chm_table==2){
+                p=head;
+                Number_table=1;
+			}
+			null(chm,chm_fill,chm_table);
+		}
+
     }
     return 0;
+}
+void AddFirst(PNode &head,PNode NewTable){
+	NewTable->next=head;
+	head=NewTable;
+}
+PNode NewTable(){
+	PNode NewTable = new Node;
+	NewTable->a;
+	NewTable->next=NULL;
+	return NewTable;
+}
+void AddAfter(PNode p, PNode NewTable)
+{
+    NewTable->next=p->next;
+    p->next=NewTable;
+}
+void AddLast(PNode &head,PNode NewTable){
+   PNode q=head;
+    if(head==NULL){
+        AddFirst(head,NewTable);
+    }
+    else{
+       while (q->next) q = q->next;
+       AddAfter(head,NewTable);
+    }
 }
 void Size(int &row,int& col){
 	system("cls");
